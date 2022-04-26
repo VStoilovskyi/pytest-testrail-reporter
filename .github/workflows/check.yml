@@ -19,7 +19,7 @@ jobs:
       - run: pip install flake8
 
       - name: Run flake8 checks
-        run: flake8 pytest_testrail_client
+        run: flake8 pytest_testrail_integrator
 
   mypy_checks:
     runs-on: ubuntu-latest
@@ -43,4 +43,4 @@ jobs:
           pipenv install --system --dev
 
       - name: Run mypy checks
-        run: mypy pytest_testrail_client
+        run: mypy pytest_testrail_integrator

@@ -4,7 +4,7 @@ import os
 
 from setuptools import setup, find_packages
 
-__version__ = '0.0.1b'
+__version__ = '0.0.1b1'
 
 
 def read_file(filename):
@@ -23,7 +23,7 @@ def read_file(filename):
 
 
 setup(
-    name='pytest-testrail-reporter',
+    name='pytest-testrail-integrator',
     version=__version__,
     description='Pytest plugin for sending report to testrail system.',
     long_description_content_type="text/markdown",
@@ -41,7 +41,7 @@ setup(
     ],
     entry_points={
         'pytest11': [
-            'pytest_message = pytest_testrail_client.plugin',
+            'pytest_testrail_integrator = pytest_testrail_integrator.plugin',
         ]
     }
 )

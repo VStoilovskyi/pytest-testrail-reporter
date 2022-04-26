@@ -7,22 +7,24 @@ test execution.
 
 ### Installation
 ```shell
-pip install pytest-testrail-reporter
+pip install pytest-testrail-integrator
 ```
 
 ### Example 
 
-In order to receive messages you need to mark test with `pytest.mark.case` or `tr_case` decorator with testcase id passing as argument.
+In order to link pytest test to testrail case you need to mark test with `pytest.mark.case` or `tr_case` 
+decorator with testcase id passing as argument.
 
 ```python
 import pytest
 
-from pytest_testrail_client import tr_case
+from pytest_testrail_integrator import tr_case
 
 
 @pytest.mark.case('98765')  # Use raw pytest marker.
 def test_sum():
     assert 1 + 1 == 2
+
 
 @tr_case('987654')  # Use custom decorator.
 def test_divide():
