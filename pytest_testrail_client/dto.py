@@ -5,7 +5,7 @@ from _pytest._code import ExceptionInfo
 from _pytest._code.code import TerminalRepr
 from _pytest.mark import Mark
 
-from src.plugins.pytest_tr_client.constants import PytestStatus
+from pytest_testrail_client.constants import PytestStatus
 
 
 @dataclasses.dataclass

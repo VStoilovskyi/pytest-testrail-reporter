@@ -10,11 +10,15 @@ from _pytest.nodes import Item
 from _pytest.reports import TestReport
 from _pytest.runner import CallInfo
 
-from src.plugins.pytest_tr_client.config import TrConfig
-from src.plugins.pytest_tr_client.constants import TR_MARKER_NAME, TR_PASSED_TESTS_FLUSH_SIZE, TestrailStatus, \
+from .config import TrConfig
+from .constants import TR_MARKER_NAME, TR_PASSED_TESTS_FLUSH_SIZE, TestrailStatus, \
     PytestStatus, TESTRAIL_STATUS_PRIORITY, PYTEST_TO_TESTRAIL_STATUS
-from src.plugins.pytest_tr_client.dto import ReportDTO
-from src.plugins.pytest_tr_client.service import TrService
+from .dto import ReportDTO
+from .service import TrService
+
+
+def tr_case(case_id: Union[str, int]):
+    return pytest.mark.case(case_id)
 
 
 def is_master(config) -> bool:
@@ -107,9 +111,7 @@ class TrClient:
         return sorted(out, key=lambda x: TESTRAIL_STATUS_PRIORITY[TestrailStatus(x['status_id'])])
 
     def __prepare_item_report(self, report: ReportDTO) -> dict:
-        """
-        Prepares API report item.
-        """
+        """Prepares API report item."""
 
         return {
             "case_id": report.case_id,
@@ -134,16 +136,27 @@ class TrClient:
     def __is_parametrized_test(markers: List[Mark]):
         """
         Checks if the list contains parametrized marker.
-        :param markers: List of test's markers.
-        :return: bool
+
+        Args:
+            markers: List of test's markers.
+
+        Returns:
+            boolean
+
         """
+
         return any([x.name == 'parametrize' for x in markers])
 
     def _try_send_passed_reports(self, results: List[ReportDTO]) -> None:
         """
-        Prepare and send all passed tests then delete them from the reports list.
-        :param results: All results within node.
-        :return: None
+        Prepare and send all passed tests only then delete them from the reports list.
+
+        Args:
+            results: All results within node.
+
+        Returns:
+            None
+
         """
         passed_results = list(filter(lambda x: x.status == PytestStatus.PASSED, results))
         results[:] = list(filter(lambda x: x.status != PytestStatus.PASSED, results))
