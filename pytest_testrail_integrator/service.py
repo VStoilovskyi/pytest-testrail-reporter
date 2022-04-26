@@ -2,7 +2,7 @@ from typing import List, Iterable
 
 from testrail_api import TestRailAPI
 
-from pytest_testrail_client.config import TrConfig
+from pytest_testrail_integrator.config import TrConfig
 
 
 class TrService:

@@ -1,8 +1,8 @@
 from _pytest.config.argparsing import Parser
 
-from pytest_testrail_client.client import TrClient
-from pytest_testrail_client.service import TrService
-from pytest_testrail_client.config import TrConfig
+from pytest_testrail_integrator.client import TrClient
+from pytest_testrail_integrator.service import TrService
+from pytest_testrail_integrator.config import TrConfig
 
 
 def pytest_addoption(parser: Parser):
