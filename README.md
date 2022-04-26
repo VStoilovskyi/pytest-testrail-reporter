@@ -17,7 +17,7 @@ In order to receive messages you need to mark test with `pytest.mark.case` or `t
 ```python
 import pytest
 
-from pytest_testrail_client.client import tr_case
+from pytest_testrail_client import tr_case
 
 
 @pytest.mark.case('98765')  # Use raw pytest marker.
