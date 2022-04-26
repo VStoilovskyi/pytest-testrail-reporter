@@ -117,7 +117,7 @@ class TrClient:
             "case_id": report.case_id,
             "status_id": PYTEST_TO_TESTRAIL_STATUS[report.status].value,
             "comment": self.__prepare_comment(report),
-            "elapsed": f"{math.ceil(report.duration)}s"
+            "elapsed": f"{round(report.duration, 2)}s"
         }
 
     def __prepare_comment(self, report: ReportDTO):
