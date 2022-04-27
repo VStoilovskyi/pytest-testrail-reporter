@@ -1,8 +1,8 @@
 import pickle
 from typing import List, Union
 
+import pydash
 import pytest
-from _pytest._code.code import ExceptionChainRepr
 from _pytest.config import ExitCode, Config
 from _pytest.main import Session
 from _pytest.mark import Mark
@@ -86,8 +86,9 @@ class TrClient:
     def pytest_sessionfinish(self, session: Session, exitstatus: Union[int, ExitCode]):
         yield
         if not is_master(session.config):
-            # Serialize results on worker only and place in workeroutput to pass results to master node
-            session.config.workeroutput[WORKER_RESULTS_KEY] = pickle.dumps(self._results)
+            # Serialize results on worker node and place in workeroutput to pass results to master node
+            workeroutput = getattr(session.config, "workeroutput")
+            workeroutput[WORKER_RESULTS_KEY] = pickle.dumps(self._results)
         else:
             if not self._service.is_test_run_available():
                 # Todo: Probably it would be better to create new test run after all tests are collected.
@@ -128,10 +129,10 @@ class TrClient:
             # crop by [ and ] to select parametrize ID
             msg = f"Test ID: {msg[msg.find('[') + 1: msg.find(']')]}"
 
-        if report.status == PytestStatus.FAILED and isinstance(report.longrepr, ExceptionChainRepr):
-            return f'{msg}\n{report.longrepr.reprcrash.message}'
-        if report.status == PytestStatus.SKIPPED and isinstance(report.longrepr, tuple):
-            return msg + f'\n{report.longrepr[2]}'
+        if report.status == PytestStatus.FAILED:
+            return f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message"), ""}'
+        if report.status == PytestStatus.SKIPPED:
+            return msg + f'\n{pydash.get(report, "longrepr[2]", "")}'
         return msg
 
     @staticmethod

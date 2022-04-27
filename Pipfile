@@ -6,5 +6,6 @@ name = "pypi"
 [packages]
 pytest = "*"
 testrail-api = "*"
+pydash = "*"
 
 [dev-packages]
