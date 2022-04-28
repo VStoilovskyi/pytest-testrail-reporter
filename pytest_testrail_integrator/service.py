@@ -8,9 +8,9 @@ from pytest_testrail_integrator.config import TrConfig
 class TrService:
     _tests: list
 
-    def __init__(self, config):
+    def __init__(self, config, tr_api: TestRailAPI):
         self._config: TrConfig = config.tr_config
-        self._api = TestRailAPI(self._config.api_url, self._config.user_email, self._config.user_password)
+        self._api = tr_api
 
     def is_test_run_available(self) -> bool:
         return bool(self._config.run_id)

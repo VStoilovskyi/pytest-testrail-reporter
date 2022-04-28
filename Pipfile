@@ -9,3 +9,5 @@ testrail-api = "*"
 pydash = "*"
 
 [dev-packages]
+pytest = "*"
+pytest-mock = "*"

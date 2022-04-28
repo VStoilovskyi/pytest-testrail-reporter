@@ -1,4 +1,5 @@
 from _pytest.config.argparsing import Parser
+from testrail_api import TestRailAPI
 
 from pytest_testrail_integrator.client import TrClient
 from pytest_testrail_integrator.service import TrService
@@ -25,8 +26,10 @@ def pytest_addoption(parser: Parser):
 
 def pytest_configure(config):
     if config.getoption('--tr-reporting'):
-        config.tr_config = TrConfig(config)
-        config.tr_service = TrService(config)
+        tr_config = TrConfig(config)
+        tr_api = TestRailAPI(tr_config.api_url, tr_config.user_email, tr_config.user_password)
+        config.tr_config = tr_config
+        config.tr_service = TrService(config, tr_api)
         plugin = TrClient(config)
         config.pluginmanager.register(plugin)
         config.testrail_reporter = plugin
