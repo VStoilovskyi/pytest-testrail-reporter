@@ -25,6 +25,7 @@ class TrService:
         if not hasattr(self, '_tests'):
             if not self._config.run_id:
                 raise ValueError('RunId is not available.')
+            # Todo: Add support of receiving more than 250 tests
             self._tests = self._api.tests.get_tests(int(self._config.run_id))
         return self._tests
 
@@ -39,17 +40,38 @@ class TrService:
         if results:
             return self._api.results.add_results_for_cases(int(self._config.run_id), results)
 
-    def create_test_run(self, case_ids: Iterable[int]) -> int:
+    def create_test_run(self, case_ids: Iterable[int]) -> None:
         """
         Creates new test with test cases matching with passed case_ids param.
-        :param case_ids: List of int, testrail case ids.
-        :return:
+        Args:
+            case_ids: List of int, testrail case ids.
+
+        Returns:
+            None
         """
+        assert self._config.suite_id and self._config.suite_id.isdigit()
+
+        tr_cases = self.__filter_pytest_cases(case_ids)
+
         r = self._api.runs.add_run(
             self._config.project_id,
             name='Automated Test run',
             include_all=False,
-            case_ids=list(case_ids)
+            case_ids=tr_cases
         )
-        self._config.run_id = r['id']  # guessing the key
-        return 0
+        self._config.run_id = r['id']
+
+    def __filter_pytest_cases(self, cases: Iterable[int]) -> List[int]:
+        """
+        Filter cases and return the only cases which are present in testrail suite.
+        Args:
+            cases: List of integers. Testcase ids
+
+        Returns:
+            New List[int] containing the only ids present in testrail.
+        """
+        # Todo: Add support of getting more than 250 cases.
+        suite_cases = self._api.cases.get_cases(self._config.project_id, suite_id=self._config.suite_id)
+        suite_cases_ids = [x['id'] for x in suite_cases]
+
+        return list(filter(lambda x: x in suite_cases_ids, cases))

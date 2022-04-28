@@ -42,6 +42,7 @@ TR_API_URL
 TR_USER_EMAIL
 TR_USER_PASSWORD
 TR_PROJECT_ID
+TR_SUTE_ID
 ```
 
 Or
@@ -60,7 +61,7 @@ pytest tests --tr-reporting
 | option              | description                                                                                                                                                                              |
 |---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | --tr-reporting      | Create and update testruns with TestRail                                                                                                                                                 |
-| --tr_deselect_tests | If pass testrun id only. Selects only tests which have been marked with case decorator with appropriate case id. Other tests are marked as deselected and not started in test execution. |
+| --tr-deselect-tests | If pass testrun id only. Selects only tests which have been marked with case decorator with appropriate case id. Other tests are marked as deselected and not started in test execution. |
 
 ### All available pytest.ini options.
 | option           | description                                                                           |
@@ -70,3 +71,4 @@ pytest tests --tr-reporting
 | tr_user_email    | Testrail User email for API authentication.                                           |
 | tr_user_password | Testrail User password for API authentication.                                        |
 | tr_project_id    | Testrail Project Id. Required for new test run creation if Test Run Id is not passed. |
+| tr_suite_id      | Testrail Suite Id. Required for new test run creation if Test Run Id is not passed.   |

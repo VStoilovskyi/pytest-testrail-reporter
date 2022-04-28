@@ -10,7 +10,8 @@ PYTEST_ENV = {
     "TR_API_URL": "test.com",
     "TR_USER_EMAIL": "test@test.com",
     "TR_USER_PASSWORD": "qwerty",
-    "TR_PROJECT_ID": "321"
+    "TR_PROJECT_ID": "321",
+    "TR_SUITE_ID": '1122'
 }
 
 
