@@ -14,7 +14,7 @@ def pytest_addoption(parser: Parser):
         help='Setup TestRail report client for upload test results.'
     )
     group.addoption(
-        '--tr_deselect_tests',
+        '--tr-deselect-tests',
         action='store_true',
         help='Deselect tests if its\' case is not present in run.'
     )
@@ -22,6 +22,7 @@ def pytest_addoption(parser: Parser):
     parser.addini('tr_user_email', default='', help='Testrail user\'s email.')
     parser.addini('tr_user_password', default='', help='Testrail user\'s password.')
     parser.addini('tr_project_id', default='', help='Testrail project id for new testrun creation.')
+    parser.addini('tr_suite_id', default='', help='Testrail suite id to create test run from.')
 
 
 def pytest_configure(config):
