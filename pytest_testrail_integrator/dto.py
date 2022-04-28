@@ -1,5 +1,5 @@
 import dataclasses
-from typing import List, Union
+from typing import List, Union, Tuple
 
 from _pytest._code import ExceptionInfo
 from _pytest._code.code import TerminalRepr
@@ -15,5 +15,5 @@ class ReportDTO:
     markers: List[Mark]
     status: PytestStatus
     duration: float
-    longrepr: Union[None, ExceptionInfo[BaseException], tuple[str, int, str], str, TerminalRepr]
+    longrepr: Union[None, ExceptionInfo[BaseException], Tuple[str, int, str], str, TerminalRepr]
     case_id: int

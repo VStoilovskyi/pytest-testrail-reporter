@@ -1,8 +1,8 @@
-# Pytest-Testrail-Reporter
+# Pytest Testrail Integrator.
 
-Pytest-testrail-reporter is a pytest extension for reporting test results to [Testrail](https://www.gurock.com/testrail).
+Pytest-testrail-integrator is a pytest extension for reporting test results to [Testrail](https://www.gurock.com/testrail).
 
-Pytest-testrail-reporter gives an ability to send test results to specific testrail run or can create new one during 
+Pytest-testrail-integrator gives an ability to send test results to specific testrail run or can create new one during 
 test execution.
 
 ### Installation

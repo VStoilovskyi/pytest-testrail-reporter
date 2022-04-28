@@ -28,11 +28,10 @@ setup(
     description='Pytest plugin for sending report to testrail system.',
     long_description_content_type="text/markdown",
     long_description=read_file('README.md'),
-    author_email='vadym.stoilovskyi@gmail.com',
     url='https://github.com/VStoilovskyi/pytest-testrail-reporter',
     packages=find_packages(),
-    install_requires=['pytest>=6.2.5', 'testrail-api'],
-    license='Apache 2.0',
+    install_requires=['pytest>=6.2.5', 'testrail-api', 'pydash'],
+    license='MIT',
     keywords=['report', 'pytest', 'testrail'],
     classifiers=[
         'Framework :: Pytest',

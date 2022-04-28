@@ -1,7 +1,7 @@
-import math
 import pickle
 from typing import List, Union
 
+import pydash
 import pytest
 from _pytest.config import ExitCode, Config
 from _pytest.main import Session
@@ -16,12 +16,14 @@ from .constants import TR_MARKER_NAME, TR_PASSED_TESTS_FLUSH_SIZE, TestrailStatu
 from .dto import ReportDTO
 from .service import TrService
 
+WORKER_RESULTS_KEY = 'tr_results'
+
 
 def tr_case(case_id: Union[str, int]):
     return pytest.mark.case(case_id)
 
 
-def is_master(config) -> bool:
+def is_master(config: Config) -> bool:
     """
     True if the code running the given pytest.config object is
     running in a xdist master node or not running xdist at all.
@@ -84,8 +86,9 @@ class TrClient:
     def pytest_sessionfinish(self, session: Session, exitstatus: Union[int, ExitCode]):
         yield
         if not is_master(session.config):
-            # Serialize results and place in workeroutput to pass data to master node
-            session.config.workeroutput['tr_results'] = pickle.dumps(self._results)
+            # Serialize results on worker node and place in workeroutput to pass results to master node
+            workeroutput = getattr(session.config, "workeroutput")
+            workeroutput[WORKER_RESULTS_KEY] = pickle.dumps(self._results)
         else:
             if not self._service.is_test_run_available():
                 # Todo: Probably it would be better to create new test run after all tests are collected.
@@ -97,7 +100,7 @@ class TrClient:
         """
         Extend master node results with worker's node results.
         """
-        node_reports = pickle.loads(node.workeroutput['tr_results'])
+        node_reports = pickle.loads(node.workeroutput[WORKER_RESULTS_KEY])
         self._results.extend(node_reports)
 
     def _prepare_report(self, results: List[ReportDTO], testrun_cases: List[int]):
@@ -107,7 +110,7 @@ class TrClient:
         for report_item in filtered:
             out.append(self.__prepare_item_report(report_item))
 
-        # Sort results by testrail status.
+        # Sort results by testrail status to get failed results on top.
         return sorted(out, key=lambda x: TESTRAIL_STATUS_PRIORITY[TestrailStatus(x['status_id'])])
 
     def __prepare_item_report(self, report: ReportDTO) -> dict:
@@ -117,19 +120,19 @@ class TrClient:
             "case_id": report.case_id,
             "status_id": PYTEST_TO_TESTRAIL_STATUS[report.status].value,
             "comment": self.__prepare_comment(report),
-            "elapsed": f"{math.ceil(report.duration)}s"
+            "elapsed": f"{round(report.duration, 2) or 0.01}s"  # No need to pass more precise elapse time than 0.01s
         }
 
     def __prepare_comment(self, report: ReportDTO):
         msg = report.name
         if self.__is_parametrized_test(report.markers):
             # crop by [ and ] to select parametrize ID
-            msg = f"Test IDENTIFIER: {msg[msg.find('[') + 1: msg.find(']')]}"
+            msg = f"Test ID: {msg[msg.find('[') + 1: msg.find(']')]}"
 
         if report.status == PytestStatus.FAILED:
-            return f'{msg}\n{report.longrepr.reprcrash.message}'
+            return f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message"), ""}'
         if report.status == PytestStatus.SKIPPED:
-            return msg + f'\n{report.longrepr[2]}'
+            return msg + f'\n{pydash.get(report, "longrepr[2]", "")}'
         return msg
 
     @staticmethod
