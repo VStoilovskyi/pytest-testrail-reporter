@@ -6,6 +6,7 @@ from pytest_testrail_integrator.client import TrClient
 from pytest_testrail_integrator.config import TrConfig
 
 
+@pytest.mark.usefixtures("setup_env")
 class TestClient:
 
     @pytest.mark.parametrize("deselect_flag, tests_count", [(True, 0), (False, 1)])
@@ -14,7 +15,7 @@ class TestClient:
         config = pytester.parseconfig()
         options = {
             "--tr-reporting": True,
-            "--tr_deselect_tests": deselect_flag
+            "--tr-deselect-tests": deselect_flag
         }
 
         config.getoption = lambda x, y=None: options[x] or y

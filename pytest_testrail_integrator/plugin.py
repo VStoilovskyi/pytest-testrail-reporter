@@ -1,3 +1,5 @@
+import pytest
+from _pytest.config import PytestPluginManager
 from _pytest.config.argparsing import Parser
 from testrail_api import TestRailAPI
 
@@ -23,6 +25,13 @@ def pytest_addoption(parser: Parser):
     parser.addini('tr_user_password', default='', help='Testrail user\'s password.')
     parser.addini('tr_project_id', default='', help='Testrail project id for new testrun creation.')
     parser.addini('tr_suite_id', default='', help='Testrail suite id to create test run from.')
+    parser.addini('tr_run_id', default='', help='Testrail run id to update tests in.')
+
+
+@pytest.hookimpl
+def pytest_addhooks(pluginmanager: PytestPluginManager):
+    from pytest_testrail_integrator import new_hooks
+    pluginmanager.add_hookspecs(new_hooks)
 
 
 def pytest_configure(config):
