@@ -1,11 +1,10 @@
 import pytest
-from _pytest.config import PytestPluginManager
-from _pytest.config.argparsing import Parser
+from pytest import PytestPluginManager, Parser
 from testrail_api import TestRailAPI
 
 from pytest_testrail_integrator.client import TrClient
-from pytest_testrail_integrator.service import TrService
 from pytest_testrail_integrator.config import TrConfig
+from pytest_testrail_integrator.service import TrService
 
 
 def pytest_addoption(parser: Parser):
@@ -20,12 +19,18 @@ def pytest_addoption(parser: Parser):
         action='store_true',
         help='Deselect tests if its\' case is not present in run.'
     )
+    group.addoption(
+        '--tr-tb',
+        action='store',
+        help='Sets traceback level in testrail message reports.'
+    )
     parser.addini('tr_url', default='', help='Testrail Api url.')
     parser.addini('tr_user_email', default='', help='Testrail user\'s email.')
     parser.addini('tr_user_password', default='', help='Testrail user\'s password.')
     parser.addini('tr_project_id', default='', help='Testrail project id for new testrun creation.')
     parser.addini('tr_suite_id', default='', help='Testrail suite id to create test run from.')
     parser.addini('tr_run_id', default='', help='Testrail run id to update tests in.')
+    parser.addini('tr_tb', default='', help='Sets traceback level in testrail message reports.')
 
 
 @pytest.hookimpl

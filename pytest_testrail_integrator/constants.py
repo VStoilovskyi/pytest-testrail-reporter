@@ -31,3 +31,8 @@ PYTEST_TO_TESTRAIL_STATUS = {
     PytestStatus.FAILED: TestrailStatus.FAILED,
     PytestStatus.SKIPPED: TestrailStatus.SKIP
 }
+
+
+class TestrailMsgStyle(enum.Enum):
+    LONG = 'long'
+    SHORT = 'short'

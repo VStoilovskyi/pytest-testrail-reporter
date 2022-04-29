@@ -1,9 +1,8 @@
 import dataclasses
 from typing import List, Union, Tuple
 
-from _pytest._code import ExceptionInfo
 from _pytest._code.code import TerminalRepr
-from _pytest.mark import Mark
+from pytest import ExceptionInfo, Mark
 
 from pytest_testrail_integrator.constants import PytestStatus
 
