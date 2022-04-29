@@ -17,10 +17,13 @@ class TrService:
 
     @property
     def tests(self):
-        """
-        Gets Tests from run if RunId is defined.
-        :raises ValueError: When runId in configs is not defined.
-        :return: List of test dicts.
+        """Gets Tests from run if RunId is defined.
+
+        Returns:
+            List of test dicts.
+        Raises:
+            ValueError: When runId in configs is not defined.
+
         """
         if not hasattr(self, '_tests'):
             if not self._config.run_id:
@@ -30,9 +33,11 @@ class TrService:
         return self._tests
 
     def get_cases(self) -> List[int]:
-        """
-        Gets list of case ids within entire test run if defined.
-        :return: List of integers.
+        """Gets list of case ids within entire test run if defined.
+
+        Returns:
+            List of integers.
+
         """
         return [x['case_id'] for x in self.tests]
 
@@ -41,14 +46,15 @@ class TrService:
             return self._api.results.add_results_for_cases(int(self._config.run_id), results)
 
     def create_test_run(self, run_name: str,  case_ids: Iterable[int]) -> None:
-        """
-        Creates new test with test cases matching with passed case_ids param.
+        """Creates new test with test cases matching with passed case_ids param.
+
         Args:
             run_name: New test run name str.
             case_ids: List of int, testrail case ids.
 
         Returns:
             None
+
         """
         assert self._config.suite_id and self._config.suite_id.isdigit()
 
@@ -66,11 +72,13 @@ class TrService:
     def __filter_pytest_cases(self, cases: Iterable[int]) -> List[int]:
         """
         Filter cases and return the only cases which are present in testrail suite.
+
         Args:
-            cases: List of integers. Testcase ids
+            cases: List of integers. Testcase ids.
 
         Returns:
-            New List[int] containing the only ids present in testrail.
+            List[int] containing the only ids present in testrail.
+
         """
         # Todo: Add support of getting more than 250 cases.
         suite_cases = self._api.cases.get_cases(self._config.project_id, suite_id=self._config.suite_id)

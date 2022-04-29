@@ -102,9 +102,7 @@ class TrClient:
         return 'Automated test run ' + current_date
 
     def pytest_testnodedown(self, node, error):
-        """
-        Extend master node results with worker's node results.
-        """
+        """Extend master node results with worker's node results."""
         node_reports = pickle.loads(node.workeroutput[WORKER_RESULTS_KEY])
         self._results.extend(node_reports)
 
@@ -169,8 +167,7 @@ class TrClient:
         return any([x.name == 'parametrize' for x in markers])
 
     def _try_send_passed_reports(self, results: List[ReportDTO]) -> None:
-        """
-        Prepare and send all passed tests only then delete them from the reports list.
+        """Prepare and send all passed tests only then delete them from the reports list.
 
         Args:
             results: All results within node.

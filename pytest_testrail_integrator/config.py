@@ -6,6 +6,8 @@ from pytest_testrail_integrator.constants import TestrailMsgStyle
 
 
 class TrConfig:
+    """Object storing entire configs set for Testrail-Integrator plugin."""
+
     def __init__(self, config: Config):
         self._config = config
         self.start_client = config.getoption('--tr-reporting')
