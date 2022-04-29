@@ -23,9 +23,6 @@ def pytest_addoption(parser: Parser):
     group.addoption(
         '--tr-tb',
         action='store',
-        type=str,
-        const='short',
-        nargs='?',
         help='Sets traceback level in testrail message reports.'
     )
     parser.addini('tr_url', default='', help='Testrail Api url.')

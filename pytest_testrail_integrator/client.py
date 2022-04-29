@@ -4,12 +4,7 @@ from typing import List, Union
 
 import pydash
 import pytest
-from _pytest.config import ExitCode, Config
-from _pytest.main import Session
-from _pytest.mark import Mark
-from _pytest.nodes import Item
-from _pytest.reports import TestReport
-from _pytest.runner import CallInfo
+from pytest import ExitCode, Config, Session, Mark, Item, TestReport, CallInfo
 
 from .config import TrConfig
 from .constants import TR_MARKER_NAME, TR_PASSED_TESTS_FLUSH_SIZE, TestrailStatus, \
