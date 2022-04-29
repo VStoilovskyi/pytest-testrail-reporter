@@ -40,10 +40,11 @@ class TrService:
         if results:
             return self._api.results.add_results_for_cases(int(self._config.run_id), results)
 
-    def create_test_run(self, case_ids: Iterable[int]) -> None:
+    def create_test_run(self, run_name: str,  case_ids: Iterable[int]) -> None:
         """
         Creates new test with test cases matching with passed case_ids param.
         Args:
+            run_name: New test run name str.
             case_ids: List of int, testrail case ids.
 
         Returns:
@@ -55,9 +56,10 @@ class TrService:
 
         r = self._api.runs.add_run(
             self._config.project_id,
-            name='Automated Test run',
+            name=run_name,
             include_all=False,
-            case_ids=tr_cases
+            case_ids=tr_cases,
+            suite_id=self._config.suite_id
         )
         self._config.run_id = r['id']
 

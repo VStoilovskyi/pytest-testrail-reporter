@@ -1,4 +1,5 @@
 import pickle
+from datetime import datetime
 from typing import List, Union
 
 import pydash
@@ -92,9 +93,18 @@ class TrClient:
         else:
             if not self._service.is_test_run_available():
                 # Todo: Probably it would be better to create new test run after all tests are collected.
-                self._service.create_test_run(self._service.get_cases())
+                config = session.config
+                run_name = config.hook.pytest_tr_generate_run_name(config=config)
+                actual_cases = {x.case_id for x in self._results}
+                self._service.create_test_run(run_name, actual_cases)
 
             self._service.upload_results(self._prepare_report(self._results, self._service.get_cases()))
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_tr_generate_run_name(self, config):
+        """Default tr run name generation."""
+        current_date = datetime.now().utcnow().strftime("%d-%h-%y %H:%MUTC")
+        return 'Automated test run ' + current_date
 
     def pytest_testnodedown(self, node, error):
         """
@@ -130,7 +140,7 @@ class TrClient:
             msg = f"Test ID: {msg[msg.find('[') + 1: msg.find(']')]}"
 
         if report.status == PytestStatus.FAILED:
-            return f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message"), ""}'
+            return f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message", "")}'
         if report.status == PytestStatus.SKIPPED:
             return msg + f'\n{pydash.get(report, "longrepr[2]", "")}'
         return msg

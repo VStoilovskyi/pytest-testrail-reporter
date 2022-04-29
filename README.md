@@ -3,7 +3,7 @@
 Pytest-testrail-integrator is a pytest extension for reporting test results to [Testrail](https://www.gurock.com/testrail).
 
 Pytest-testrail-integrator gives an ability to send test results to specific testrail run or can create new one during 
-test execution.
+test execution. Fully compatible with `xdist` parallelization tool.
 
 ### Installation
 ```shell
@@ -18,7 +18,7 @@ decorator with testcase id passing as argument.
 ```python
 import pytest
 
-from pytest_testrail_integrator import tr_case
+from pytest_testrail_integrator.client import tr_case
 
 
 @pytest.mark.case('98765')  # Use raw pytest marker.
@@ -31,6 +31,12 @@ def test_divide():
     assert 2 / 1 == 2
 ```
 Test case id must not start with "C" char and can be either string or integer.
+
+
+### Main flow overview.
+At startup plugin checks if the Testrail run id is passed or not. If not passed - plugin will create new test run by 
+itself. Then during tests execution testrail tests will be updated in real time.
+
 
 ### Config for TestRail
 
@@ -72,3 +78,9 @@ pytest tests --tr-reporting
 | tr_user_password | Testrail User password for API authentication.                                        |
 | tr_project_id    | Testrail Project Id. Required for new test run creation if Test Run Id is not passed. |
 | tr_suite_id      | Testrail Suite Id. Required for new test run creation if Test Run Id is not passed.   |
+
+
+### Hooks
+#### pytest_tr_generate_run_name(config: pytest.Config) - > str:
+
+Executes for generating new testrail run name right before create test run request is sent. Takes first hook result.
