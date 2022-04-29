@@ -14,7 +14,7 @@ class TestClient:
         config = pytester.parseconfig()
         options = {
             "--tr-reporting": True,
-            "--tr_deselect_tests": deselect_flag
+            "--tr-deselect-tests": deselect_flag
         }
 
         config.getoption = lambda x, y=None: options[x] or y
