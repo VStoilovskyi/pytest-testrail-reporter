@@ -13,7 +13,7 @@ from _pytest.runner import CallInfo
 
 from .config import TrConfig
 from .constants import TR_MARKER_NAME, TR_PASSED_TESTS_FLUSH_SIZE, TestrailStatus, \
-    PytestStatus, TESTRAIL_STATUS_PRIORITY, PYTEST_TO_TESTRAIL_STATUS
+    PytestStatus, TESTRAIL_STATUS_PRIORITY, PYTEST_TO_TESTRAIL_STATUS, TestrailMsgStyle
 from .dto import ReportDTO
 from .service import TrService
 
@@ -140,10 +140,23 @@ class TrClient:
             msg = f"Test ID: {msg[msg.find('[') + 1: msg.find(']')]}"
 
         if report.status == PytestStatus.FAILED:
-            return f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message", "")}'
+            tb = f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message", "")}'
+            if self._tr_config.tb_style == TestrailMsgStyle.LONG:
+                return tb
+            elif self._tr_config.tb_style == TestrailMsgStyle.SHORT:
+                return self._shorten_error(tb)
         if report.status == PytestStatus.SKIPPED:
             return msg + f'\n{pydash.get(report, "longrepr[2]", "")}'
         return msg
+
+    @staticmethod
+    def _shorten_error(err: str) -> str:
+        """Cuts long traceback message."""
+        if not err:
+            return err
+
+        cut_until = err.find('\n + ')  # May be changed to more accurate substr
+        return err[:cut_until]
 
     @staticmethod
     def __is_parametrized_test(markers: List[Mark]):

@@ -70,14 +70,15 @@ pytest tests --tr-reporting
 | --tr-deselect-tests | If pass testrun id only. Selects only tests which have been marked with case decorator with appropriate case id. Other tests are marked as deselected and not started in test execution. |
 
 ### All available pytest.ini options.
-| option           | description                                                                           |
-|------------------|---------------------------------------------------------------------------------------|
-| tr_api_url       | Testrail api url.                                                                     |
-| tr_run_id        | Testrail test run id. If passed test reports are linked to this particular test run.  |
-| tr_user_email    | Testrail User email for API authentication.                                           |
-| tr_user_password | Testrail User password for API authentication.                                        |
-| tr_project_id    | Testrail Project Id. Required for new test run creation if Test Run Id is not passed. |
-| tr_suite_id      | Testrail Suite Id. Required for new test run creation if Test Run Id is not passed.   |
+| option           | description                                                                                           |
+|------------------|-------------------------------------------------------------------------------------------------------|
+| tr_api_url       | Testrail api url.                                                                                     |
+| tr_run_id        | Testrail test run id. If passed test reports are linked to this particular test run.                  |
+| tr_user_email    | Testrail User email for API authentication.                                                           |
+| tr_user_password | Testrail User password for API authentication.                                                        |
+| tr_project_id    | Testrail Project Id. Required for new test run creation if Test Run Id is not passed.                 |
+| tr_suite_id      | Testrail Suite Id. Required for new test run creation if Test Run Id is not passed.                   |
+| tr_tb            | Traceback level in testrail message reports. ['short', 'long'] options. Short is selected by default. |
 
 
 ### Hooks
