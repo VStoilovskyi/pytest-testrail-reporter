@@ -6,6 +6,7 @@ from pytest_testrail_integrator.client import TrClient
 from pytest_testrail_integrator.config import TrConfig
 
 
+@pytest.mark.usefixtures("setup_env")
 class TestClient:
 
     @pytest.mark.parametrize("deselect_flag, tests_count", [(True, 0), (False, 1)])
