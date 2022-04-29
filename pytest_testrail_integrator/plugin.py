@@ -1,6 +1,5 @@
 import pytest
-from _pytest.config import PytestPluginManager
-from _pytest.config.argparsing import Parser
+from pytest import PytestPluginManager, Parser
 from testrail_api import TestRailAPI
 
 from pytest_testrail_integrator.client import TrClient

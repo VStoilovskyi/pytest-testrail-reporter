@@ -1,6 +1,6 @@
 import os
 
-from _pytest.config import Config
+from pytest import Config
 
 from pytest_testrail_integrator.constants import TestrailMsgStyle
 
