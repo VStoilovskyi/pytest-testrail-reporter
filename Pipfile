@@ -11,3 +11,4 @@ pydash = "*"
 [dev-packages]
 pytest = "*"
 pytest-mock = "*"
+pytest-cov = "*"

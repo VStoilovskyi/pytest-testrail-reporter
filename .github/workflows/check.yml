@@ -74,5 +74,8 @@ jobs:
       - name: Install dependencies
         run: |
           pipenv install --system --dev
-      - name: Test pytest
-        run: python -m pytest .
+      - name: Test and build coverage
+        run: |
+          python -m pytest --cache-clear --cov=pytest_testrail_integrator tests > pytest-coverage.txt
+      - name: Comment coverage
+        uses: coroo/pytest-coverage-commentator@v1.0.2
