@@ -55,7 +55,11 @@ class TrClient:
         result: TestReport = (yield).get_result()
         if call.when == 'call' or result.outcome == 'skipped':
             if marker := item.get_closest_marker(TR_MARKER_NAME):
-                case_id = int(marker.args[0])
+                case = marker.args[0]
+                if isinstance(case, str):
+                    case = case.replace('c', '').replace('C', '')
+
+                case_id = int(case)
 
                 report = ReportDTO(
                     item.name,
