@@ -47,4 +47,9 @@ def pytest_configure(config):
         config.tr_service = TrService(config, tr_api)
         plugin = TrClient(config)
         config.pluginmanager.register(plugin)
+        if config.pluginmanager.hasplugin("xdist"):
+
+            from pytest_testrail_integrator.xdist.xdist_tr_adapter import XdistTrClintAdapter
+            config.pluginmanager.register(XdistTrClintAdapter(plugin))
+
         config.testrail_reporter = plugin
