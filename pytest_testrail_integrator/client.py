@@ -108,7 +108,6 @@ class TrClient:
         current_date = datetime.now().utcnow().strftime("%d-%h-%y %H:%MUTC")
         return 'Automated test run ' + current_date
 
-
     def _prepare_report(self, results: List[ReportDTO], testrun_cases: List[int]):
         # Remove redundant result reports
         filtered = filter(lambda x: x.case_id in testrun_cases, results)
