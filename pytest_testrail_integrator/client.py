@@ -1,6 +1,6 @@
 import pickle
 from datetime import datetime
-from typing import List, Union
+from typing import List, Union, Iterable
 
 import pydash
 import pytest
@@ -34,6 +34,9 @@ class TrClient:
         self._tr_config: TrConfig = config.tr_config
         self._results: List[ReportDTO] = []
         self._passed_tests_count = 0
+
+    def add_results(self, results: Iterable[ReportDTO]) -> None:
+        self._results.extend(results)
 
     def pytest_collection_modifyitems(self, session: Session, config: Config, items: List[Item]):
         if self._service.is_test_run_available() and self._tr_config.deselect_tests:
@@ -104,11 +107,6 @@ class TrClient:
         """Default tr run name generation."""
         current_date = datetime.now().utcnow().strftime("%d-%h-%y %H:%MUTC")
         return 'Automated test run ' + current_date
-
-    def pytest_testnodedown(self, node, error):
-        """Extend master node results with worker's node results."""
-        node_reports = pickle.loads(node.workeroutput[WORKER_RESULTS_KEY])
-        self._results.extend(node_reports)
 
     def _prepare_report(self, results: List[ReportDTO], testrun_cases: List[int]):
         # Remove redundant result reports
