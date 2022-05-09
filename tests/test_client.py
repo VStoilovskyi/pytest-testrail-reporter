@@ -24,13 +24,13 @@ class TestClient:
         config.tr_config = TrConfig(config)
 
         item = mocker.MagicMock()
-        item.get_closest_marker.return_value = Mark('case', ('1234',), {})
+        item.get_closest_marker.return_value = Mark('case', ('12345',), {})
         items = [item]
 
         service_mock = mocker.MagicMock()
         config.tr_service = service_mock
         service_mock.is_test_run_available.return_value = True
-        service_mock.tests.return_value = [1234, 5678]
+        service_mock.get_cases.return_value = [1234, 5678]
 
         client = TrClient(config)
         client.pytest_collection_modifyitems(mocker.MagicMock(), config, items)

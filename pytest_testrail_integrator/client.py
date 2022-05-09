@@ -80,10 +80,13 @@ class TrClient:
                     self._passed_tests_count += 1
 
                 # Try to flush passed results per node
-                if self._service.is_test_run_available() and \
-                        self._passed_tests_count > TR_PASSED_TESTS_FLUSH_SIZE:
-                    self._try_send_passed_reports(self._results)
-                    self._passed_tests_count = 0
+                self._try_flush_reports()
+
+    def _try_flush_reports(self):
+        if self._service.is_test_run_available() and \
+                self._passed_tests_count > TR_PASSED_TESTS_FLUSH_SIZE:
+            self._try_send_passed_reports(self._results)
+            self._passed_tests_count = 0
 
     @pytest.hookimpl(hookwrapper=True, trylast=True)
     def pytest_sessionfinish(self, session: Session, exitstatus: Union[int, ExitCode]):
