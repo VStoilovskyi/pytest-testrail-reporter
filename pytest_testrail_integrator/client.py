@@ -39,53 +39,70 @@ class TrClient:
         self._results.extend(results)
 
     def pytest_collection_modifyitems(self, session: Session, config: Config, items: List[Item]):
-        if self._service.is_test_run_available() and self._tr_config.deselect_tests:
-            tr_run_cases = self._service.get_cases()
-            deselected = []
-            selected = []
-            for item in items:
-                marker = item.get_closest_marker(TR_MARKER_NAME)
-                if not marker or int(marker.args[0]) not in tr_run_cases:
-                    deselected.append(item)
-                else:
-                    selected.append(item)
-            items[:] = selected
+        cond = (self._service.is_test_run_available(), self._tr_config.deselect_tests)
+        if not all(cond):
+            return
 
-            config.hook.pytest_deselected(items=deselected)
+        tr_run_cases = self._service.get_cases()
+        deselected = []
+        selected = []
+        for item in items:
+            marker = item.get_closest_marker(TR_MARKER_NAME)
+            if not marker:
+                selected.append(item)
+                continue
+
+            case_id = self._get_marker_case_id(marker)
+            if case_id not in tr_run_cases:
+                deselected.append(item)
+            else:
+                selected.append(item)
+        items[:] = selected
+
+        config.hook.pytest_deselected(items=deselected)
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_runtest_makereport(self, item: Item, call: CallInfo):
+        marker = item.get_closest_marker(TR_MARKER_NAME)
+        if not marker:
+            return
+
+        case_id = self._get_marker_case_id(marker)
+
         result: TestReport = (yield).get_result()
+
         if call.when == 'call' or result.outcome == 'skipped':
-            if marker := item.get_closest_marker(TR_MARKER_NAME):
-                case = marker.args[0]
-                if isinstance(case, str):
-                    case = case.replace('c', '').replace('C', '')
 
-                case_id = int(case)
+            report = ReportDTO(
+                item.name,
+                item.nodeid,
+                item.own_markers,
+                PytestStatus(result.outcome),
+                result.duration,
+                result.longrepr,
+                case_id
+            )
 
-                report = ReportDTO(
-                    item.name,
-                    item.nodeid,
-                    item.own_markers,
-                    PytestStatus(result.outcome),
-                    result.duration,
-                    result.longrepr,
-                    case_id
-                )
+            self._results.append(report)
 
-                self._results.append(report)
+            if report.status == PytestStatus.PASSED:
+                self._passed_tests_count += 1
 
-                if report.status == PytestStatus.PASSED:
-                    self._passed_tests_count += 1
+            # Try to flush passed results per node
+            self._try_flush_reports()
 
-                # Try to flush passed results per node
-                self._try_flush_reports()
+    @staticmethod
+    def _get_marker_case_id(marker):
+        case = marker.args[0]
+        if isinstance(case, str):
+            case = case.lower().replace('c', '')
+        case_id = int(case)
+        return case_id
 
     def _try_flush_reports(self):
         if self._service.is_test_run_available() and \
                 self._passed_tests_count > TR_PASSED_TESTS_FLUSH_SIZE:
-            self._try_send_passed_reports(self._results)
+            self._send_passed_reports(self._results)
             self._passed_tests_count = 0
 
     @pytest.hookimpl(hookwrapper=True, trylast=True)
@@ -171,7 +188,7 @@ class TrClient:
 
         return any([x.name == 'parametrize' for x in markers])
 
-    def _try_send_passed_reports(self, results: List[ReportDTO]) -> None:
+    def _send_passed_reports(self, results: List[ReportDTO]) -> None:
         """Prepare and send all passed tests only then delete them from the reports list.
 
         Args:
