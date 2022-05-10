@@ -39,17 +39,18 @@ class TrClient:
         self._results.extend(results)
 
     def pytest_collection_modifyitems(self, session: Session, config: Config, items: List[Item]):
+        """Select tests containing in testrail test run only."""
         cond = (self._service.is_test_run_available(), self._tr_config.deselect_tests)
         if not all(cond):
             return
 
         tr_run_cases = self._service.get_cases()
-        deselected = []
-        selected = []
+        deselected, selected = [], []
+
         for item in items:
             marker = item.get_closest_marker(TR_MARKER_NAME)
             if not marker:
-                selected.append(item)
+                deselected.append(item)
                 continue
 
             case_id = self._get_marker_case_id(marker)
