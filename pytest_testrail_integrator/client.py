@@ -67,11 +67,11 @@ class TrClient:
                 report = ReportDTO(
                     item.name,
                     item.nodeid,
-                    item.own_markers,
                     PytestStatus(result.outcome),
                     result.duration,
                     result.longrepr,
-                    case_id
+                    case_id,
+                    self.__is_parametrized_test(item.own_markers)
                 )
 
                 self._results.append(report)
@@ -130,7 +130,7 @@ class TrClient:
 
     def __prepare_comment(self, report: ReportDTO):
         msg = report.name
-        if self.__is_parametrized_test(report.markers):
+        if report.is_parametrized:
             # crop by [ and ] to select parametrize ID
             msg = f"Test ID: {msg[msg.find('[') + 1: msg.find(']')]}"
 
