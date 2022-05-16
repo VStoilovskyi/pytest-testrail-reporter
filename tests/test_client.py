@@ -23,3 +23,11 @@ class TestClient:
         client = TrClient(mocked_config)
         client.pytest_collection_modifyitems(mocker.MagicMock(), mocked_config, items)
         assert len(items) == tests_count
+
+    def test_client_makereport_no_case_marker(self, mocker: MockerFixture, mocked_client):
+        """Checks that no report for tests without case id marker."""
+        item: pytest.Item = mocker.create_autospec(pytest.Item)
+        item.own_markers = mocker.PropertyMock(Mark('some_marker', tuple(), {}))
+        item.get_closest_marker.return_value = None
+
+        mocked_client.pytest_runtest_makereport(item, mocker.MagicMock())
