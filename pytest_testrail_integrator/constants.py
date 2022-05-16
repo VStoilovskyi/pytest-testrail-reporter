@@ -1,7 +1,7 @@
 import enum
 
 TR_MARKER_NAME = 'case'
-TR_PASSED_TESTS_FLUSH_SIZE = 10
+TR_PASSED_TESTS_FLUSH_SIZE = 500
 
 
 class TestrailStatus(enum.Enum):
