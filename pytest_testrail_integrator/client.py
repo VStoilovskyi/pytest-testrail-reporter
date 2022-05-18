@@ -74,15 +74,15 @@ class TrClient:
 
         if call.when == 'call' or result.outcome == 'skipped':
 
-                report = ReportDTO(
-                    item.name,
-                    item.nodeid,
-                    PytestStatus(result.outcome),
-                    result.duration,
-                    result.longrepr,
-                    case_id,
-                    self.__is_parametrized_test(item.own_markers)
-                )
+            report = ReportDTO(
+                item.name,
+                item.nodeid,
+                PytestStatus(result.outcome),
+                result.duration,
+                result.longrepr,
+                case_id,
+                self.__is_parametrized_test(item.own_markers)
+            )
 
             self._results.append(report)
 
