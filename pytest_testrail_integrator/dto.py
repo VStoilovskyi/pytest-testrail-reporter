@@ -1,8 +1,8 @@
 import dataclasses
-from typing import List, Union, Tuple
+from typing import Union, Tuple
 
 from _pytest._code.code import TerminalRepr
-from pytest import ExceptionInfo, Mark
+from pytest import ExceptionInfo
 
 from pytest_testrail_integrator.constants import PytestStatus
 
@@ -11,8 +11,8 @@ from pytest_testrail_integrator.constants import PytestStatus
 class ReportDTO:
     name: str
     nodeid: str
-    markers: List[Mark]
     status: PytestStatus
     duration: float
     longrepr: Union[None, ExceptionInfo[BaseException], Tuple[str, int, str], str, TerminalRepr]
     case_id: int
+    is_parametrized: bool
