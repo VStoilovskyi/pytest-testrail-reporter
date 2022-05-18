@@ -29,7 +29,7 @@ class TrService:
             if not self._config.run_id:
                 raise ValueError('RunId is not available.')
             # Todo: Add support of receiving more than 250 tests
-            self._tests = self._api.tests.get_tests(int(self._config.run_id))
+            self._tests = self._api.tests.get_tests(int(self._config.run_id))['tests']
         return self._tests
 
     def get_cases(self) -> List[int]:
@@ -81,7 +81,7 @@ class TrService:
 
         """
         # Todo: Add support of getting more than 250 cases.
-        suite_cases = self._api.cases.get_cases(self._config.project_id, suite_id=self._config.suite_id)
+        suite_cases = self._api.cases.get_cases(self._config.project_id, suite_id=self._config.suite_id)['cases']
         suite_cases_ids = [x['id'] for x in suite_cases]
 
         return list(filter(lambda x: x in suite_cases_ids, cases))
