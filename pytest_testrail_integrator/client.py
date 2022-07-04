@@ -118,8 +118,9 @@ class TrClient:
                 # Todo: Probably it would be better to create new test run after all tests are collected.
                 config = session.config
                 run_name = config.hook.pytest_tr_generate_run_name(config=config)
+                run_description = config.hook.pytest_tr_generate_run_description(config=config)
                 actual_cases = {x.case_id for x in self._results}
-                self._service.create_test_run(run_name, actual_cases)
+                self._service.create_test_run(run_name, run_description, actual_cases)
 
             self._service.upload_results(self._prepare_report(self._results, self._service.get_cases()))
 
@@ -128,6 +129,10 @@ class TrClient:
         """Default tr run name generation."""
         current_date = datetime.now().utcnow().strftime("%d-%h-%y %H:%MUTC")
         return 'Automated test run ' + current_date
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_tr_generate_run_description(self, config):
+        return ""
 
     def _prepare_report(self, results: List[ReportDTO], testrun_cases: List[int]):
         # Remove redundant result reports
