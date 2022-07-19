@@ -13,23 +13,27 @@ class TestrailStatus(enum.Enum):
     IN_PROGRESS = 6
     SKIP = 7
     REOPENED = 8
+    BROKEN = 9
 
 
 class PytestStatus(enum.Enum):
     PASSED = 'passed'
     FAILED = 'failed'
     SKIPPED = 'skipped'
+    BROKEN = 'broken'
 
 
 TESTRAIL_STATUS_PRIORITY = {
     TestrailStatus.PASSED: 1,
     TestrailStatus.SKIP: 2,
-    TestrailStatus.FAILED: 3
+    TestrailStatus.FAILED: 3,
+    TestrailStatus.BROKEN: 4,
 }
 PYTEST_TO_TESTRAIL_STATUS = {
     PytestStatus.PASSED: TestrailStatus.PASSED,
     PytestStatus.FAILED: TestrailStatus.FAILED,
-    PytestStatus.SKIPPED: TestrailStatus.SKIP
+    PytestStatus.SKIPPED: TestrailStatus.SKIP,
+    PytestStatus.BROKEN: TestrailStatus.BROKEN,
 }
 
 

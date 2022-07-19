@@ -4,6 +4,7 @@ from typing import List, Union, Iterable
 
 import pydash
 import pytest
+from _pytest.outcomes import Skipped
 from pytest import ExitCode, Config, Session, Mark, Item, TestReport, CallInfo
 
 from .config import TrConfig
@@ -66,30 +67,28 @@ class TrClient:
     def pytest_runtest_makereport(self, item: Item, call: CallInfo):
         result: TestReport = (yield).get_result()
         marker = item.get_closest_marker(TR_MARKER_NAME)
-        if not marker:
+        if not marker or call.when != 'call':
             return
 
         case_id = self._get_marker_case_id(marker)
 
-        if call.when == 'call' or result.outcome == 'skipped':
+        report = ReportDTO(
+            item.name,
+            item.nodeid,
+            self.__get_pytestrail_status(call),
+            result.duration,
+            result.longrepr,
+            case_id,
+            self.__is_parametrized_test(item.own_markers)
+        )
 
-            report = ReportDTO(
-                item.name,
-                item.nodeid,
-                PytestStatus(result.outcome),
-                result.duration,
-                result.longrepr,
-                case_id,
-                self.__is_parametrized_test(item.own_markers)
-            )
+        self._results.append(report)
 
-            self._results.append(report)
+        if report.status == PytestStatus.PASSED:
+            self._passed_tests_count += 1
 
-            if report.status == PytestStatus.PASSED:
-                self._passed_tests_count += 1
-
-            # Try to flush passed results per node
-            self._try_flush_reports()
+        # Try to flush passed results per node
+        self._try_flush_reports()
 
     @staticmethod
     def _get_marker_case_id(marker):
@@ -104,6 +103,21 @@ class TrClient:
                 self._passed_tests_count > TR_PASSED_TESTS_FLUSH_SIZE:
             self._send_passed_reports(self._results)
             self._passed_tests_count = 0
+
+    @staticmethod
+    def __get_pytestrail_status(call: CallInfo) -> PytestStatus:
+        """Gets PytestStatus depending on CallInfo data. Separate Broken tests from Failed by Exception class."""
+        if call.excinfo is None:
+            return PytestStatus.PASSED
+        exc_info_type = call.excinfo.type
+
+        if exc_info_type == Skipped:
+            return PytestStatus.SKIPPED
+        if exc_info_type == AssertionError:
+            return PytestStatus.FAILED
+
+        # Test is marked as BROKEN if Exception is not of type AssertionError.
+        return PytestStatus.BROKEN
 
     @pytest.hookimpl(hookwrapper=True, trylast=True)
     def pytest_sessionfinish(self, session: Session, exitstatus: Union[int, ExitCode]):
