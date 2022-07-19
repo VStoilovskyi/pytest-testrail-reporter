@@ -185,7 +185,7 @@ class TrClient:
             # crop by [ and ] to select parametrize ID
             msg = f"Test ID: {msg[msg.find('[') + 1: msg.find(']')]}"
 
-        if report.status == PytestStatus.FAILED:
+        if report.status in [PytestStatus.FAILED, PytestStatus.BROKEN]:
             tb = f'{msg}\n{pydash.get(report, "longrepr.reprcrash.message", "")}'
             if self._tr_config.tb_style == TestrailMsgStyle.LONG:
                 return tb
