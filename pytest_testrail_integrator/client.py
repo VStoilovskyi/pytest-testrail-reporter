@@ -64,13 +64,12 @@ class TrClient:
 
     @pytest.hookimpl(hookwrapper=True)
     def pytest_runtest_makereport(self, item: Item, call: CallInfo):
+        result: TestReport = (yield).get_result()
         marker = item.get_closest_marker(TR_MARKER_NAME)
         if not marker:
             return
 
         case_id = self._get_marker_case_id(marker)
-
-        result: TestReport = (yield).get_result()
 
         if call.when == 'call' or result.outcome == 'skipped':
 
@@ -109,25 +108,42 @@ class TrClient:
     @pytest.hookimpl(hookwrapper=True, trylast=True)
     def pytest_sessionfinish(self, session: Session, exitstatus: Union[int, ExitCode]):
         yield
-        if not is_master(session.config):
-            # Serialize results on worker node and place in workeroutput to pass results to master node
-            workeroutput = getattr(session.config, "workeroutput")
-            workeroutput[WORKER_RESULTS_KEY] = pickle.dumps(self._results)
-        else:
+        config = session.config
+        if is_master(config):
             if not self._service.is_test_run_available():
                 # Todo: Probably it would be better to create new test run after all tests are collected.
-                config = session.config
-                run_name = config.hook.pytest_tr_generate_run_name(config=config)
-                actual_cases = {x.case_id for x in self._results}
-                self._service.create_test_run(run_name, actual_cases)
-
+                self._create_new_tr_run(config)
             self._service.upload_results(self._prepare_report(self._results, self._service.get_cases()))
+
+        else:
+            # Serialize results on worker node and place in workeroutput to pass results to master node
+            workeroutput = getattr(config, "workeroutput")
+            workeroutput[WORKER_RESULTS_KEY] = pickle.dumps(self._results)
+
+    def _create_new_tr_run(self, config):
+        """
+        Creates new test run with required test cases as well as title with description.
+        Args:
+            config: Session.Config instance
+
+        Returns: None
+
+        """
+        run_name = config.hook.pytest_tr_generate_run_name(config=config)
+        run_description = config.hook.pytest_tr_generate_run_description(config=config)
+        actual_cases = {x.case_id for x in self._results}
+        self._service.create_test_run(run_name, run_description, actual_cases)
 
     @pytest.hookimpl(trylast=True)
     def pytest_tr_generate_run_name(self, config):
         """Default tr run name generation."""
         current_date = datetime.now().utcnow().strftime("%d-%h-%y %H:%MUTC")
         return 'Automated test run ' + current_date
+
+    @pytest.hookimpl(trylast=True)
+    def pytest_tr_generate_run_description(self, config):
+        """Default tr description is empty."""
+        return ""
 
     def _prepare_report(self, results: List[ReportDTO], testrun_cases: List[int]):
         # Remove redundant result reports

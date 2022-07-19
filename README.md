@@ -85,3 +85,7 @@ pytest tests --tr-reporting
 #### pytest_tr_generate_run_name(config: pytest.Config) - > str:
 
 Executes for generating new testrail run name right before create test run request is sent. Takes first hook result.
+
+#### pytest_tr_generate_run_description(config) - > str:
+
+Executes for generating new testrail run description right before create test run request is sent. Takes first hook result.
