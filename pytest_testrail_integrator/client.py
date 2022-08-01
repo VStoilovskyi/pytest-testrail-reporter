@@ -67,7 +67,8 @@ class TrClient:
     def pytest_runtest_makereport(self, item: Item, call: CallInfo):
         result: TestReport = (yield).get_result()
         marker = item.get_closest_marker(TR_MARKER_NAME)
-        if not marker or call.when != 'call':
+        cond = (call.when == 'call', result.outcome == 'skipped')
+        if not marker or not any(cond):
             return
 
         case_id = self._get_marker_case_id(marker)
